@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lunatic Rynek</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+    <div id="photoHud" class="photo-hud hidden">
+        <div class="photo-top-bar"><div class="photo-icon"><i class="fas fa-camera"></i></div><span>TRYB ZDJECIA</span></div>
+        <div class="photo-controls">
+            <div class="photo-key"><kbd>MYSZKA</kbd> Obrót</div>
+            <div class="photo-key"><kbd>SCROLL</kbd> Zoom</div>
+            <div class="photo-key"><kbd>ENTER</kbd> Zdjęcie</div>
+            <div class="photo-key"><kbd>ESC</kbd> Anuluj</div>
+        </div>
+    </div>
+
+    <div id="app" class="hidden">
+        <div class="topbar">
+            <div class="topbar-left">
+                <div class="logo"><i class="fas fa-store"></i> Rynek</div>
+                <nav class="nav">
+                    <a class="nav-link active" data-tab="browse">Itemy</a>
+                    <a class="nav-link" data-tab="vehicles">Pojazdy</a>
+                    <a class="nav-link" data-tab="sell">Wystaw</a>
+                    <a class="nav-link" data-tab="mylistings">Moje oferty</a>
+                </nav>
+            </div>
+            <div class="topbar-right">
+                <div class="coins-box"><div class="coin-circle">C</div><span class="coins-value" id="coinBalance">0</span></div>
+                <div class="search-box" id="searchBox"><i class="fas fa-search"></i><input type="text" id="searchInput" placeholder="Szukaj..."></div>
+                <button class="btn-refresh" id="refreshBtn"><i class="fas fa-sync-alt"></i></button>
+                <button class="btn-close" id="closeBtn">&times;</button>
+            </div>
+        </div>
+
+        <div class="page" id="browseTab">
+            <div class="section-header"><div class="line"></div><h2>OFERTY ITEMOW</h2><div class="line"></div></div>
+            <div class="listings-grid" id="listingsGrid"></div>
+            <div class="empty-state hidden" id="emptyBrowse"><i class="fas fa-box-open"></i><p>Brak ofert</p></div>
+        </div>
+        <div class="page hidden" id="vehiclesTab">
+            <div class="section-header"><div class="line"></div><h2>OFERTY POJAZDOW</h2><div class="line"></div></div>
+            <div class="listings-grid vehicle-listings-grid" id="vehicleListingsGrid"></div>
+            <div class="empty-state hidden" id="emptyVehicles"><i class="fas fa-car"></i><p>Brak pojazdow</p></div>
+        </div>
+        <div class="page hidden" id="sellTab">
+            <div class="sell-subtabs">
+                <button class="sell-subtab active" data-sub="items"><i class="fas fa-box"></i> Itemy</button>
+                <button class="sell-subtab" data-sub="sellvehicles"><i class="fas fa-car"></i> Pojazdy</button>
+            </div>
+            <div class="sell-section" id="sellItemsSection">
+                <div class="sell-items-grid" id="sellItemsGrid"></div>
+                <div class="empty-state hidden" id="emptyInventory"><i class="fas fa-cube"></i><p>Brak przedmiotow</p></div>
+            </div>
+            <div class="sell-section hidden" id="sellVehiclesSection">
+                <p class="sell-hint"><i class="fas fa-info-circle"></i> Podjedź autem blisko, kliknij i zrób zdjęcie</p>
+                <div class="sell-items-grid" id="sellVehiclesGrid"></div>
+                <div class="empty-state hidden" id="emptyVehiclesInv"><i class="fas fa-car-side"></i><p>Brak pojazdow</p></div>
+            </div>
+        </div>
+        <div class="page hidden" id="mylistingsTab">
+            <div class="section-header"><div class="line"></div><h2>MOJE OFERTY ITEMOW</h2><div class="line"></div></div>
+            <div class="my-listings-grid" id="myListingsGrid"></div>
+            <div class="empty-state hidden" id="emptyMyListings"><i class="fas fa-clipboard-list"></i><p>Brak</p></div>
+            <div class="section-header" style="margin-top:28px"><div class="line"></div><h2>MOJE OFERTY POJAZDOW</h2><div class="line"></div></div>
+            <div class="my-listings-grid" id="myVehicleListingsGrid"></div>
+            <div class="empty-state hidden" id="emptyMyVehListings"><i class="fas fa-car"></i><p>Brak</p></div>
+        </div>
+
+        <div class="rynek-footer">
+            <img src="logo.png" class="footer-logo" alt="logo">
+            <div class="footer-text">Lunatic<span class="footer-gg">GG</span></div>
+            <div class="footer-divider"></div>
+            <div class="footer-discord"><i class="fab fa-discord"></i> discord.gg/lunaticgg</div>
+        </div>
+
+        <div class="overlay hidden" id="buyModal">
+            <div class="modal-box">
+                <div class="modal-top"><h2><i class="fas fa-shopping-cart"></i> Potwierdz zakup</h2><button class="btn-x" id="buyModalClose">&times;</button></div>
+                <div class="modal-body buy-confirm">
+                    <div class="buy-photo-wrap hidden" id="buyPhotoWrap"><img id="buyPhoto" src=""></div>
+                    <div class="buy-item-preview">
+                        <div class="buy-item-icon" id="buyIcon"><i class="fas fa-box"></i></div>
+                        <div class="buy-item-details">
+                            <div class="buy-item-name" id="buyItemName">Item</div>
+                            <div class="buy-item-count" id="buyItemCount">1x</div>
+                            <div class="buy-item-seller" id="buyItemSeller">---</div>
+                            <div class="buy-item-discord hidden" id="buyItemDiscord"></div>
+                        </div>
+                    </div>
+                    <div class="buy-price-row" id="buyPriceRow"><span class="buy-price-label">Cena:</span><span class="buy-price-value" id="buyPrice">$0</span></div>
+                </div>
+                <div class="modal-bottom"><button class="btn-ghost" id="buyCancel">Anuluj</button><button class="btn-green" id="buyConfirm"><i class="fas fa-check"></i> Kupuje</button></div>
+            </div>
+        </div>
+
+        <div class="overlay hidden" id="sellModal">
+            <div class="modal-box">
+                <div class="modal-top"><h2><i class="fas fa-tag"></i> Wystawianie</h2><button class="btn-x" id="sellModalClose">&times;</button></div>
+                <div class="modal-body sell-form">
+                    <div class="sell-item-header">
+                        <div class="sell-item-icon" id="sellItemIcon"><i class="fas fa-box"></i></div>
+                        <div><div class="sell-item-name" id="sellItemName">Item</div><div class="sell-item-available" id="sellItemAvailable">0</div></div>
+                    </div>
+                    <div class="form-group"><label>Ilosc</label><div class="input-row"><input type="number" id="sellCount" value="1" min="1"><button class="btn-sm" onclick="document.getElementById('sellCount').value=1">MIN</button><button class="btn-sm" id="sellMaxBtn">MAX</button></div></div>
+                    <div class="form-group"><label>Waluta</label><div class="currency-toggle" id="currencyToggle"><button class="curr-btn active" data-curr="money"><i class="fas fa-dollar-sign"></i> Dolary</button><button class="curr-btn" data-curr="coins"><div class="coin-circle-sm">C</div> Coiny</button></div></div>
+                    <div class="form-group"><label>Cena</label><input type="number" id="sellPrice" value="100" min="10"></div>
+                    <div class="form-group"><label>Czas trwania</label><div class="duration-grid" id="durationGrid"></div></div>
+                    <div class="sell-summary"><div class="summary-row"><span>Podatek (<span id="taxPercent">5</span>%):</span><span class="tax-value" id="taxValue">-$0</span></div><div class="summary-row total"><span>Otrzymasz:</span><span class="earnings-value" id="earningsValue">$0</span></div></div>
+                </div>
+                <div class="modal-bottom"><button class="btn-ghost" id="sellCancel">Anuluj</button><button class="btn-red" id="sellConfirm"><i class="fas fa-gavel"></i> Wystaw</button></div>
+            </div>
+        </div>
+
+        <div class="overlay hidden" id="sellVehicleModal">
+            <div class="modal-box modal-wide">
+                <div class="modal-top"><h2><i class="fas fa-car"></i> Wystawianie pojazdu</h2><button class="btn-x" id="sellVehModalClose">&times;</button></div>
+                <div class="modal-body sell-form">
+                    <div class="sell-photo-preview hidden" id="sellPhotoPreview"><img id="sellPhotoImg" src=""><div class="sell-photo-badge"><i class="fas fa-camera"></i> Zdjecie</div></div>
+                    <div class="sell-item-header"><div class="sell-item-icon veh-icon"><i class="fas fa-car"></i></div><div><div class="sell-item-name" id="sellVehName">Pojazd</div><div class="sell-item-available" id="sellVehPlate">---</div></div></div>
+                    <div class="form-group"><label>Waluta</label><div class="currency-toggle" id="currencyToggleVeh"><button class="curr-btn active" data-curr="money"><i class="fas fa-dollar-sign"></i> Dolary</button><button class="curr-btn" data-curr="coins"><div class="coin-circle-sm">C</div> Coiny</button></div></div>
+                    <div class="form-group"><label>Cena</label><input type="number" id="sellVehPrice" value="50000" min="1000"></div>
+                    <div class="form-group"><label>Czas trwania</label><div class="duration-grid" id="durationGridVeh"></div></div>
+                    <div class="sell-summary"><div class="summary-row"><span>Podatek (<span id="vehTaxPercent">5</span>%):</span><span class="tax-value" id="vehTaxValue">-$0</span></div><div class="summary-row total"><span>Otrzymasz:</span><span class="earnings-value" id="vehEarningsValue">$0</span></div></div>
+                </div>
+                <div class="modal-bottom"><button class="btn-ghost" id="sellVehCancel">Anuluj</button><button class="btn-red" id="sellVehConfirm"><i class="fas fa-gavel"></i> Wystaw</button></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <div id="photoLightbox" class="lightbox hidden" onclick="closeLightbox()">
+        <div class="lightbox-content" onclick="event.stopPropagation()"><img id="lightboxImg" src=""><button class="lightbox-close" onclick="closeLightbox()">&times;</button></div>
+        <div class="lightbox-hint">Kliknij poza zdjęcie lub ESC aby zamknąć</div>
+    </div>
+</body>
+</html>
